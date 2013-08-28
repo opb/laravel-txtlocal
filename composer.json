@@ -1,0 +1,20 @@
+{
+    "name": "opb/laravel-txtlocal",
+    "description": "",
+    "authors": [
+        {
+            "name": "Olly Butterfield",
+            "email": "olly@opb.me.uk"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "illuminate/support": "4.0.x"
+    },
+    "autoload": {
+        "psr-0": {
+            "Opb\\LaravelTxtlocal": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
