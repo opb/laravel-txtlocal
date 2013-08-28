@@ -1,6 +1,7 @@
 {
     "name": "opb/laravel-txtlocal",
-    "description": "",
+    "description": "Library to use the TxtLocal online messaging service with Laravel 4",
+    "license": "MIT",
     "authors": [
         {
             "name": "Olly Butterfield",

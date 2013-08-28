@@ -18,7 +18,11 @@ class LaravelTxtlocalServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		//
+        $this->app['txtlocal'] = $this->app->share(function($app)
+        {
+            return new TxtLocal;
+        });
+
 	}
 
 	/**
