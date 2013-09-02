@@ -12,13 +12,27 @@ class LaravelTxtlocalServiceProvider extends ServiceProvider {
 	protected $defer = false;
 
 	/**
+	 * Bootstrap the application events.
+	 *
+	 * @return void
+	 */
+	public function boot()
+	{
+		$this->package('opb/laravel-txtlocal');
+	}
+
+	/**
 	 * Register the service provider.
 	 *
 	 * @return void
 	 */
 	public function register()
 	{
-		//
+        $this->app['laravel-txtlocal'] = $this->app->share(function($app)
+        {
+            return new LaravelTxtlocal;
+        });
+
 	}
 
 	/**
@@ -28,7 +42,7 @@ class LaravelTxtlocalServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array();
+		return array('laravel-txtlocal');
 	}
 
 }
