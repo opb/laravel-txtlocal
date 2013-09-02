@@ -20,7 +20,7 @@ Once the package is installed, open your `app/config/app.php` configuration file
 Next, locate the `aliases` key and add the following line:
 
 ```php
-'Txtlocal' => 'Opb\LaravelTxtlocal\Facades\Txtlocal',
+'LaravelTxtlocal' => 'Opb\LaravelTxtlocal\Facades\LaravelTxtlocal',
 ```
 
 Finally, publish the default configuration (it will end up in `app/config/packages/opb/laravel-txtlocal/config.php`):
