@@ -18,6 +18,16 @@ class LaravelTxtlocal {
 		$this->msg['comments'] = Input::get('comments');
 		$this->msg['inNumber'] = Input::get('inNumber');
 	}
+
+	public function validate($conditions)
+	{
+		foreach($conditions as $key=>$val)
+		{
+			if(strtoupper($this->msg[$key]) != strtoupper($val)) return false;
+		}
+		return true;
+	}
+
 	public function sender()
 	{
 		return trim($this->msg['sender']);
