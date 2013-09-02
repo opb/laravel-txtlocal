@@ -17,6 +17,15 @@ class LaravelTxtlocal {
 		$this->msg['content'] = Input::get('content');
 		$this->msg['comments'] = Input::get('comments');
 		$this->msg['inNumber'] = Input::get('inNumber');
+<<<<<<< HEAD
+=======
+		$this->msg['custom1'] = Input::get('custom1');
+		$this->msg['custom2'] = Input::get('custom2');
+		$this->msg['custom3'] = Input::get('custom3');
+		$this->msg['firstname'] = Input::get('firstname');
+		$this->msg['lastname'] = Input::get('lastname');
+		$this->msg['email'] = Input::get('email');
+>>>>>>> master
 
 		return $this;
 	}
@@ -53,5 +62,32 @@ class LaravelTxtlocal {
 	{
 		return trim($this->msg['inNumber']);
 	}
+<<<<<<< HEAD
+=======
+	public function custom1()
+	{
+		return trim($this->msg['custom1']);
+	}
+	public function custom2()
+	{
+		return trim($this->msg['custom2']);
+	}
+	public function custom3()
+	{
+		return trim($this->msg['custom3']);
+	}
+	public function firstname()
+	{
+		return trim($this->msg['firstname']);
+	}
+	public function lastname()
+	{
+		return trim($this->msg['lastname']);
+	}
+	public function email()
+	{
+		return trim($this->msg['email']);
+	}
+>>>>>>> master
 
 }
