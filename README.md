@@ -12,7 +12,7 @@ Currently provides the following functions:
 
 ###Installation
 
-**Note: requires the php-cUrl library to be installed.**
+**Note: requires php-cURL to be installed.**
 
 Add `opb/laravel-txtlocal` to your composer requirements:
 
@@ -90,9 +90,9 @@ $ php artisan config:publish opb/laravel-txtlocal
     // test using a route to grab the balance
     Route::post('checkbalance', function()
     {
-        // parm1 should be set to true to display MMS 
-        // returns the response from Txtlocal. See 'info' and 'json' config options
-        $result = LaravelTxtlocal::send('447739123456', 'This is a test message', 'opb');
+        // parm1 should be set to true to fetch MMS instead of SMS credits, otherwise empty
+        // returns the number of credits 
+        $result = LaravelTxtlocal::balance();
         dd($result);
     }
     ```
