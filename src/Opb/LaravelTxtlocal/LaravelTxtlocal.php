@@ -3,6 +3,7 @@
 use Illuminate\View\Environment;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Config;
 
 class LaravelTxtlocal {
 
