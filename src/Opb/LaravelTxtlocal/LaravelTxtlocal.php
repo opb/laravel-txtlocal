@@ -12,7 +12,6 @@ class LaravelTxtlocal {
 	public function __construct(){}
 
 	public function send($to_numbers, $message, $from = null){
-		// load config into variables
 		$test = Config::get('laravel-txtlocal::test');
 		$json = Config::get('laravel-txtlocal::json');
 		$info = Config::get('laravel-txtlocal::info');
@@ -58,7 +57,7 @@ class LaravelTxtlocal {
 		$result = curl_exec($ch); // this is the result from Textlocal
 		curl_close($ch);
 
-		
+		return $result;
 
 	}
 
