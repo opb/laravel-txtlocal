@@ -10,13 +10,15 @@ class LaravelTxtlocal {
 
 	public function __construct(){}
 
-	public function send($to_numbers, $message, $from = Config::get('laravel-txtlocal::from')){
+	public function send($to_numbers, $message, $from = null){
 		// load config into variables
 		$test = Config::get('laravel-txtlocal::test');
 		$json = Config::get('laravel-txtlocal::json');
 		$info = Config::get('laravel-txtlocal::info');
 		$user = Config::get('laravel-txtlocal::user');
 		$hash = Config::get('laravel-txtlocal::hash');
+
+		if(is_null($from)) $from = Config::get('laravel-txtlocal::from')
 
 		if($test != 0) $test = 1;
 		if($json != 1) $json = 0;
