@@ -7,6 +7,7 @@ Currently provides the following functions:
 
 1. HTTP POST endpoint for incoming TxtLocal messagebox. (Txtlocal service which allows an SMS to be received by them and the details POSTed to a URL specified by you)
 2. Send SMS function through TxtLocal API using cURL
+3. Check the balance of SMS/MMS credits left on the account
 
 
 ###Installation
@@ -77,6 +78,20 @@ $ php artisan config:publish opb/laravel-txtlocal
         // parm2 is the message
         // parm3 is the 'from' name/number. Optional, will use the config value
         //     if omitted. Max 11 chars if alphanumeric, or 14 numbers
+        // returns the result of the send from Txtlocal. See 'info' and 'json'
+        //     config options
+        $result = LaravelTxtlocal::send('447739123456', 'This is a test message', 'opb');
+        dd($result);
+    }
+    ```
+3. Check your balance of SMS and/or MMS credits
+
+    ```php
+    // test using a route to grab the balance
+    Route::post('checkbalance', function()
+    {
+        // parm1 should be set to true to display MMS 
+        // returns the response from Txtlocal. See 'info' and 'json' config options
         $result = LaravelTxtlocal::send('447739123456', 'This is a test message', 'opb');
         dd($result);
     }
