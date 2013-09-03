@@ -18,7 +18,7 @@ class LaravelTxtlocal {
 		$user = Config::get('laravel-txtlocal::user');
 		$hash = Config::get('laravel-txtlocal::hash');
 
-		if(is_null($from)) $from = Config::get('laravel-txtlocal::from')
+		if(is_null($from)) $from = Config::get('laravel-txtlocal::from');
 
 		if($test != 0) $test = 1;
 		if($json != 1) $json = 0;
