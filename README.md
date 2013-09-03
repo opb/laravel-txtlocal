@@ -6,9 +6,13 @@ TxtLocal is a UK based service providing incoming and outgoing SMS services. Thi
 Currently provides the following functions:
 
 1. HTTP POST endpoint for incoming TxtLocal messagebox. (Txtlocal service which allows an SMS to be received by them and the details POSTed to a URL specified by you)
+2. Send SMS function through TxtLocal API using cURL
 
 
 ###Installation
+
+**Note: requires the php-cUrl library to be installed.**
+
 Add `opb/laravel-txtlocal` to your composer requirements:
 
 ```php
@@ -61,4 +65,19 @@ $ php artisan config:publish opb/laravel-txtlocal
             return 'validation failed';
         }
     });
+    ```
+2. Send an SMS to one or more numbers. See the package config.php to set up API access.
+
+    ```php
+    // test using a route to hit to activate the SMS send
+    Route::post('send', function()
+    {
+        // parm1 is the internationalised version of the number to send to
+        //     without any leading zeroes or +, or an array of these numbers
+        // parm2 is the message
+        // parm3 is the 'from' name/number. Optional, will use the config value
+        //     if omitted. Max 11 chars if alphanumeric, or 14 numbers
+        $result = LaravelTxtlocal::send('447739123456', 'This is a test message', 'opb');
+        dd($result);
+    }
     ```
