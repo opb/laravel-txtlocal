@@ -10,6 +10,55 @@ class LaravelTxtlocal {
 
 	public function __construct(){}
 
+	public function send($to_numbers, $message, $from = Config::get('laravel-txtlocal::from')){
+		// load config into variables
+		$test = Config::get('laravel-txtlocal::test');
+		$json = Config::get('laravel-txtlocal::json');
+		$info = Config::get('laravel-txtlocal::info');
+		$user = Config::get('laravel-txtlocal::user');
+		$hash = Config::get('laravel-txtlocal::hash');
+
+		if($test != 0) $test = 1;
+		if($json != 1) $json = 0;
+		if($info != 1 || $json == 1) $info = 0;
+
+		$message = urlencode($message);
+
+		$number_string = '';
+		if(is_array($to_numbers))
+		{
+			for($i = 0; $i < count($to_numbers); $i++)
+			{
+				if($i > 0) $number_string .= ',';
+				if(is_numeric($num)) $number_string .= $num;
+			}
+		}
+		else
+		{
+			if(is_numeric($to_numbers)) $number_string = $to_numbers;
+		}
+
+		$data = "uname=".$user.
+				"&hash=".$hash.
+				"&message=".$message.
+				"&from=". $from.
+				"&selectednums=".$to_numbers.
+				"&info=".$info.
+				"&json=".$json.
+				"&test=".$test;
+
+		// Send the POST request with cURL
+		$ch = curl_init('https://www.txtlocal.com/sendsmspost.php'); // note https for SSL
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		$result = curl_exec($ch); // this is the result from Textlocal
+		curl_close($ch);
+
+		
+
+	}
+
 	public function incoming()
 	{
 		$this->msg['sender'] = Input::get('sender');
@@ -17,15 +66,12 @@ class LaravelTxtlocal {
 		$this->msg['content'] = Input::get('content');
 		$this->msg['comments'] = Input::get('comments');
 		$this->msg['inNumber'] = Input::get('inNumber');
-<<<<<<< HEAD
-=======
 		$this->msg['custom1'] = Input::get('custom1');
 		$this->msg['custom2'] = Input::get('custom2');
 		$this->msg['custom3'] = Input::get('custom3');
 		$this->msg['firstname'] = Input::get('firstname');
 		$this->msg['lastname'] = Input::get('lastname');
 		$this->msg['email'] = Input::get('email');
->>>>>>> master
 
 		return $this;
 	}
@@ -62,8 +108,6 @@ class LaravelTxtlocal {
 	{
 		return trim($this->msg['inNumber']);
 	}
-<<<<<<< HEAD
-=======
 	public function custom1()
 	{
 		return trim($this->msg['custom1']);
@@ -88,6 +132,5 @@ class LaravelTxtlocal {
 	{
 		return trim($this->msg['email']);
 	}
->>>>>>> master
 
 }
