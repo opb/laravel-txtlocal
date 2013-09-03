@@ -1,7 +1,5 @@
 #Laravel 4 Txtlocal package
 
-<<<<<<< HEAD
-=======
 ###About
 TxtLocal is a UK based service providing incoming and outgoing SMS services. This library aims to provide access to some of these functions within the Laravel PHP framework, as well as serving as package development practice for myself!
 
@@ -10,7 +8,6 @@ Currently provides the following functions:
 1. HTTP POST endpoint for incoming TxtLocal messagebox. (Txtlocal service which allows an SMS to be received by them and the details POSTed to a URL specified by you)
 
 
->>>>>>> master
 ###Installation
 Add `opb/laravel-txtlocal` to your composer requirements:
 
@@ -38,9 +35,6 @@ Finally, publish the default configuration (it will end up in `app/config/packag
 
 ```bash
 $ php artisan config:publish opb/laravel-txtlocal
-<<<<<<< HEAD
-```
-=======
 ```
 
 ###Usage
@@ -68,4 +62,3 @@ $ php artisan config:publish opb/laravel-txtlocal
         }
     });
     ```
->>>>>>> master
