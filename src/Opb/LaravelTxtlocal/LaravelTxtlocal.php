@@ -11,6 +11,23 @@ class LaravelTxtlocal {
 
 	public function __construct(){}
 
+	public function balance($mms = null){
+		$user = Config::get('laravel-txtlocal::user');
+		$hash = Config::get('laravel-txtlocal::hash');
+
+		// Prepare data for POST request
+		$data = "uname=".$user."&hash=".$hash; // Send the POST request with cURL
+		if(!is_null($mms) && ($mms == true || $mms == 'true')) $data .= '&mms=true';
+		$ch = curl_init('https://www.txtlocal.com/getcredits.php');
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		$credits = curl_exec($ch); //This is the number of credits you have left
+		curl_close($ch);	
+
+		return $credits;
+	}
+
 	public function send($to_numbers, $message, $from = null){
 		$test = Config::get('laravel-txtlocal::test');
 		$json = Config::get('laravel-txtlocal::json');
