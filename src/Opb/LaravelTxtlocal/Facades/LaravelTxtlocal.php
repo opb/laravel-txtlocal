@@ -9,6 +9,9 @@ class LaravelTxtlocal extends Facade {
      *
      * @return string
      */
-    protected static function getFacadeAccessor() { return 'laravel-txtlocal'; }
+    protected static function getFacadeAccessor() 
+    { 
+    	return 'laravel-txtlocal'; 
+    }
 
 }

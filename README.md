@@ -1,5 +1,22 @@
 #Laravel 4 Txtlocal package
 
+##Version 1.0 update - May 2014
+
+As of May 2014, this package has been upgraded, as Txtlocal have altered the way their API works. Major amendments:
+
+* Making use of Guzzle 4 as opposed to cURL directly
+* Removed functionality to process received text messages, as this is super simple to do in Laravel anyway, and this function brought nothing to the party.
+* Better in-line documentation.
+
+Having said all that, Txtlocal do provide their own PHP library, though it's not on composer. I may look into producing a straight PHP version (as opposed to Laravel-specific) which makes more use of the functionality that Txtlocal expose through their API. Currently we're only doing send SMS and getting the account balance.
+
+Any queries, please get in touch.
+
+To do:
+
+ * Add some tests for Travis
+
+
 ###About
 TxtLocal is a UK based service providing incoming and outgoing SMS services. This library aims to provide access to some of these functions within the Laravel PHP framework, as well as serving as package development practice for myself!
 
@@ -12,17 +29,17 @@ Currently provides the following functions:
 
 ###Installation
 
-**Note: requires php-cURL to be installed.**
+Installation via composer...
 
 Add `opb/laravel-txtlocal` to your composer requirements:
 
 ```php
 "require": {
-    "opb/laravel-txtlocal": "*"
+    "opb/laravel-txtlocal": "~1"
 }
 ```
 
-Now, run `composer update`
+Now run `composer update`
 
 Once the package is installed, open your `app/config/app.php` configuration file and locate the `providers` key.  Add the following line to the end:
 
@@ -44,55 +61,23 @@ $ php artisan config:publish opb/laravel-txtlocal
 
 ###Usage
 
-1. Receive an SMS sent to a Txtlocal messagebox by POST. Provides the following data fields: `custom1` `custom2` `custom3` `sender` `email` `keyword` `content` `firstname` `lastname` `inNumber` `comments`
+1. Send an SMS to one or more numbers. See the package config file to set up API access.
 
     ```php
-    // Create a route for Txtlocal to POST to
-    Route::post('incoming', function()
+    // test route to demo SMS sending
+    Route::get('send', function()
     {
-        // Process the incoming SMS details
-        $msg = LaravelTxtlocal::incoming();
-
-        // Validate by passing an array of field names and expected values
-        // Returns false if validation fails
-        $msg->validate(array('keyword' => 'ku', 'firstname' => 'Olly'));
-        if($msg)
-        {
-        	// Return the content of the message. Any field can be accessed in the same way
-	        return $msg->content();
-	    }
-        else
-        {
-            return 'validation failed';
-        }
-    });
-    ```
-2. Send an SMS to one or more numbers. See the package config.php to set up API access.
-
-    ```php
-    // test using a route to hit to activate the SMS send
-    Route::post('send', function()
-    {
-        // parm1 is the internationalised version of the number to send to
-        //     without any leading zeroes or +, or an array of these numbers
-        // parm2 is the message
-        // parm3 is the 'from' name/number. Optional, will use the config value
-        //     if omitted. Max 11 chars if alphanumeric, or 14 numbers
-        // returns the result of the send from Txtlocal. See 'info' and 'json'
-        //     config options
-        $result = LaravelTxtlocal::send('447739123456', 'This is a test message', 'opb');
-        dd($result);
+        $result = LaravelTxtlocal::send(array('447712345678'), 'This is a test message', 'SenderName');
+        return $result;
     }
     ```
-3. Check your balance of SMS and/or MMS credits
+2. Check your balance of SMS and/or MMS credits
 
     ```php
-    // test using a route to grab the balance
-    Route::post('checkbalance', function()
+    // test route to get the account balance
+    Route::get('checkbalance', function()
     {
-        // parm1 should be set to true to fetch MMS instead of SMS credits, otherwise empty
-        // returns the number of credits 
         $result = LaravelTxtlocal::balance();
-        dd($result);
+        return $result;
     }
     ```

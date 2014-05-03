@@ -1,155 +1,127 @@
 <?php namespace Opb\LaravelTxtlocal;
 
-use Illuminate\View\Environment;
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Config;
+use GuzzleHttp\Client as GuzzleClient;
 
 class LaravelTxtlocal {
 
-	protected $msg = array();
+	/**
+	 * Api Key
+	 *
+	 * @var string The API key for access to the Txtlocal account
+	 *
+	 */
+	protected $apiKey;
 
-	public function __construct(){}
+	/**
+	 * Default from name/number
+	 *
+	 * @var string Default name or number that the SMS will be sent from
+	 *
+	 */	
+	protected $from;
 
-	public function balance($mms = null){
-		$user = Config::get('laravel-txtlocal::user');
-		$hash = Config::get('laravel-txtlocal::hash');
+	/**
+	 * Set test mode to on or off
+	 *
+	 * @var boolean Use the test mode provided by Txtlocal - no real SMS sending
+	 *
+	 */	
+	protected $testMode;
 
-		// Prepare data for POST request
-		$data = "uname=".$user."&hash=".$hash; // Send the POST request with cURL
-		if(!is_null($mms) && ($mms == true || $mms == 'true')) $data .= '&mms=true';
-		$ch = curl_init('https://www.txtlocal.com/getcredits.php');
-		curl_setopt($ch, CURLOPT_POST, true);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		$credits = curl_exec($ch); //This is the number of credits you have left
-		curl_close($ch);	
+	/**
+	 * Guzzle HTTP Client - used to access Txtlocal API
+	 *
+	 * @var GuzzleHttp\Client Instance of the Guzzle Client class
+	 *
+	 */	
+	protected $guzzle;
 
-		return $credits;
+	/**
+	 * Constructor
+	 *
+	 * @param GuzzleHttp\Client $guzzle Instance of the Guzzle Client class
+	 * @param string $apiKey The API key for access to the Txtlocal account
+	 * @param string $from Default name or number that the SMS will be sent from
+	 * @param boolean $testMode Use the test mode provided by Txtlocal - no real SMS sending
+	 *
+	 * @return void
+	 *
+	 */
+	public function __construct(GuzzleClient $guzzle, $apiKey, $from, $testMode)
+	{
+		$this->apiKey = $apiKey;
+		$this->from = $from;
+		$this->testMode = $testMode;
+		$this->guzzle = $guzzle;
 	}
 
-	public function send($to_numbers, $message, $from = null){
-		$test = Config::get('laravel-txtlocal::test');
-		$json = Config::get('laravel-txtlocal::json');
-		$info = Config::get('laravel-txtlocal::info');
-		$user = Config::get('laravel-txtlocal::user');
-		$hash = Config::get('laravel-txtlocal::hash');
+	/**
+	 * Get the SMS and MMS balance on the account
+	 *
+	 * @return string JSON encoded string of the current SMS and MMS balances
+	 *
+	 */
+	public function balance(){
 
-		if(is_null($from)) $from = Config::get('laravel-txtlocal::from');
+		$postData = array(
+			'body' => array(
+				'apiKey' => $this->apiKey,
+			)
+		);
 
-		if($test != 0) $test = 1;
-		if($json != 1) $json = 0;
-		if($info != 1 || $json == 1) $info = 0;
+		$response = $this->guzzle->post('https://api.txtlocal.com/balance', $postData);
 
-		$message = urlencode($message);
+		$response = json_decode($response->getBody());
+		if($response->status != 'success')
+			throw new LaravelTxtlocalException('Unexpected result from Txtlocal API');
+		
+		return json_encode($response->balance);
 
-		$number_string = '';
-		if(is_array($to_numbers))
+	}
+
+	/**
+	 * Send an SMS to one or more numbers
+	 *
+	 * @param array $recipients recipient numbers (as strings) to which the message is sent
+	 * @param string $message The message to be sent
+	 * @param string $from if set, overrides the default sender name
+	 *
+	 * @return string JSON encoded string of the 
+	 *
+	 */
+	public function send($recipients, $message, $from = null){
+
+		if(!$from) $from = $this->from;
+		if(preg_match('/^[0-9]+$/', $from) && (strlen($from) < 3 || strlen($from) > 13))
+			throw new LaravelTxtlocalException('Digits-only from field should be between 3 and 13 characters');
+		else if(strlen($from) < 3 || strlen($from) > 11)
+			throw new ExceLaravelTxtlocalExceptiontion('Character-based from field should be between 3 and 11 characters');
+
+		if(strlen($message) > 766)
+			throw new LaravelTxtlocalException('Message should not exceed 766 characters in length');
+
+		foreach($recipients as $num)
 		{
-			for($i = 0; $i < count($to_numbers); $i++)
-			{
-				if($i > 0) $number_string .= ',';
-				if(is_numeric($num)) $number_string .= $num;
-			}
-		}
-		else
-		{
-			if(is_numeric($to_numbers)) $number_string = $to_numbers;
+			if(!preg_match('/^[0-9]+$/i', $num)) 
+				throw new LaravelTxtlocalException('Phone number should be digits only');
 		}
 
-		$data = "uname=".$user.
-				"&hash=".$hash.
-				"&message=".$message.
-				"&from=". $from.
-				"&selectednums=".$to_numbers.
-				"&info=".$info.
-				"&json=".$json.
-				"&test=".$test;
+		$recipients = implode(',', $recipients);
 
-		// Send the POST request with cURL
-		$ch = curl_init('https://www.txtlocal.com/sendsmspost.php'); // note https for SSL
-		curl_setopt($ch, CURLOPT_POST, true);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		$result = curl_exec($ch); // this is the result from Textlocal
-		curl_close($ch);
+		$postData = array(
+			'body' => array(
+				'apiKey' => $this->apiKey,
+				'message' => $message,
+				'numbers' => $recipients,
+				'sender' => $from,
+				'test' => $this->testMode
+			)
+		);
 
-		return $result;
+		$response = $this->guzzle->post('https://api.txtlocal.com/send/', $postData);
+		$response = json_decode($response->getBody());
 
-	}
-
-	public function incoming()
-	{
-		$this->msg['sender'] = Input::get('sender');
-		$this->msg['keyword'] = Input::get('keyword');
-		$this->msg['content'] = Input::get('content');
-		$this->msg['comments'] = Input::get('comments');
-		$this->msg['inNumber'] = Input::get('inNumber');
-		$this->msg['custom1'] = Input::get('custom1');
-		$this->msg['custom2'] = Input::get('custom2');
-		$this->msg['custom3'] = Input::get('custom3');
-		$this->msg['firstname'] = Input::get('firstname');
-		$this->msg['lastname'] = Input::get('lastname');
-		$this->msg['email'] = Input::get('email');
-
-		return $this;
-	}
-
-	public function validate($conditions)
-	{
-		foreach($conditions as $key=>$val)
-		{
-			if(strtoupper($this->msg[$key]) != strtoupper($val))
-			{
-				return false;
-			} 
-		}
-		return $this;
-	}
-
-	public function sender()
-	{
-		return trim($this->msg['sender']);
-	}
-	public function keyword()
-	{
-		return trim($this->msg['keyword']);
-	}
-	public function content()
-	{
-		return trim($this->msg['content']);
-	}
-	public function comments()
-	{
-		return trim($this->msg['comments']);
-	}
-	public function inNumber()
-	{
-		return trim($this->msg['inNumber']);
-	}
-	public function custom1()
-	{
-		return trim($this->msg['custom1']);
-	}
-	public function custom2()
-	{
-		return trim($this->msg['custom2']);
-	}
-	public function custom3()
-	{
-		return trim($this->msg['custom3']);
-	}
-	public function firstname()
-	{
-		return trim($this->msg['firstname']);
-	}
-	public function lastname()
-	{
-		return trim($this->msg['lastname']);
-	}
-	public function email()
-	{
-		return trim($this->msg['email']);
+		return json_encode($response);
 	}
 
 }

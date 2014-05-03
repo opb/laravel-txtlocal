@@ -1,6 +1,8 @@
 <?php namespace Opb\LaravelTxtlocal;
 
+use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
+use Config;
 
 class LaravelTxtlocalServiceProvider extends ServiceProvider {
 
@@ -23,14 +25,17 @@ class LaravelTxtlocalServiceProvider extends ServiceProvider {
 
 	/**
 	 * Register the service provider.
-	 *
+	 * 
 	 * @return void
 	 */
 	public function register()
 	{
         $this->app['laravel-txtlocal'] = $this->app->share(function($app)
         {
-            return new LaravelTxtlocal;
+        	$apiKey = Config::get('laravel-txtlocal::apiKey');
+        	$from = Config::get('laravel-txtlocal::from');
+        	$testMode = Config::get('laravel-txtlocal::testMode');
+            return new LaravelTxtlocal(new Client, $apiKey, $from, $testMode);
         });
 
 	}
